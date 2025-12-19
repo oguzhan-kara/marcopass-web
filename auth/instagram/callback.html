@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Authentication - MarcoPass</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCAF45 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 400px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            opacity: 0.9;
+            margin-bottom: 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            margin: 2rem auto;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .success {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📸</div>
+        <h1>Connecting Instagram...</h1>
+        <p>Please wait while we complete your authentication</p>
+        <div class="spinner"></div>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const error = urlParams.get('error');
+        const errorReason = urlParams.get('error_reason');
+        const errorDescription = urlParams.get('error_description');
+
+        if (error) {
+            // Show error message
+            document.querySelector('.spinner').style.display = 'none';
+            document.querySelector('h1').textContent = 'Authentication Failed';
+            document.querySelector('p').textContent = errorDescription || error;
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = `Error: ${error}\nReason: ${errorReason || 'Unknown'}`;
+
+            // Close window after 5 seconds
+            setTimeout(() => {
+                window.close();
+            }, 5000);
+        } else if (code) {
+            // Success! Show success message
+            document.querySelector('.spinner').style.display = 'none';
+            document.querySelector('h1').textContent = '✓ Instagram Connected!';
+            document.querySelector('p').textContent = 'Redirecting back to MarcoPass...';
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('success').textContent = 'Authentication successful! You can close this window.';
+
+            // Try to communicate with the app
+            // This will be handled by the WebView in the app
+            console.log('Instagram OAuth Code:', code);
+
+            // Close window after 2 seconds
+            setTimeout(() => {
+                window.close();
+            }, 2000);
+        } else {
+            // No code or error - unexpected state
+            document.querySelector('.spinner').style.display = 'none';
+            document.querySelector('h1').textContent = 'Invalid Request';
+            document.querySelector('p').textContent = 'No authorization code received';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = 'Please try connecting Instagram again from the app.';
+
+            // Close window after 5 seconds
+            setTimeout(() => {
+                window.close();
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
